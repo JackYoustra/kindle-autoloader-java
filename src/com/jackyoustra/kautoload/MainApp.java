@@ -1,17 +1,16 @@
 package com.jackyoustra.kautoload;
 
+import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.io.File;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.filechooser.FileSystemView;
 import javax.swing.JLabel;
-
-import java.awt.BorderLayout;
+import javax.swing.filechooser.FileSystemView;
 
 public class MainApp {
 
@@ -46,6 +45,7 @@ public class MainApp {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
+		
 		frame = new JFrame();
 		frame.setBounds(100, 100, 450, 300);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -70,6 +70,17 @@ public class MainApp {
 		}, 0, TimeUnit.MILLISECONDS);
 		listenForKindle();
 	}
+	
+	private static String getDocumentsDirectory(){
+		JFileChooser fr = new JFileChooser();
+		FileSystemView fw = fr.getFileSystemView();
+		return fw.getDefaultDirectory().toString();
+	}
+	
+	private static String getManifestFileLocation(){
+		// possibly one level too high for mac
+		return getDocumentsDirectory() + File.separator + "ebooks" + File.separator + "thingToRead.xml";
+	}
 
 	private void onKindleDisconnected() {
 		lblKindleStatus.setText("Kindle not connected!");
@@ -77,6 +88,8 @@ public class MainApp {
 
 	private void onKindleConnected() {
 		lblKindleStatus.setText("Kindle connected");
+		
+		
 	}
 
 	private void listenForKindle() {
