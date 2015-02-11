@@ -3,20 +3,32 @@ package com.jackyoustra.kautoload;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.io.File;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.ListModel;
 import javax.swing.filechooser.FileSystemView;
+import javax.swing.JList;
+
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
+import javax.swing.SwingConstants;
 
 public class MainApp {
 
 	private JFrame frame;
 	private JLabel lblKindleStatus;
 	private boolean kindleConnected = false;
+	private JList BookList;
+	private JLabel lblBooks;
 
 	/**
 	 * Launch the application.
@@ -45,13 +57,42 @@ public class MainApp {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		
+
 		frame = new JFrame();
 		frame.setBounds(100, 100, 450, 300);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		GridBagLayout gridBagLayout = new GridBagLayout();
+		gridBagLayout.columnWidths = new int[] { 434, 0 };
+		gridBagLayout.rowHeights = new int[] { 14, 0, 248, 0 };
+		gridBagLayout.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
+		gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 1.0, Double.MIN_VALUE };
+		frame.getContentPane().setLayout(gridBagLayout);
 
 		lblKindleStatus = new JLabel("Kindle Not Connected");
-		frame.getContentPane().add(lblKindleStatus, BorderLayout.NORTH);
+		lblKindleStatus.setHorizontalAlignment(SwingConstants.CENTER);
+		GridBagConstraints gbc_lblKindleStatus = new GridBagConstraints();
+		gbc_lblKindleStatus.anchor = GridBagConstraints.NORTH;
+		gbc_lblKindleStatus.fill = GridBagConstraints.HORIZONTAL;
+		gbc_lblKindleStatus.insets = new Insets(0, 0, 5, 0);
+		gbc_lblKindleStatus.gridx = 0;
+		gbc_lblKindleStatus.gridy = 0;
+		frame.getContentPane().add(lblKindleStatus, gbc_lblKindleStatus);
+		
+		lblBooks = new JLabel("Books:");
+		lblBooks.setHorizontalAlignment(SwingConstants.LEFT);
+		GridBagConstraints gbc_lblBooks = new GridBagConstraints();
+		gbc_lblBooks.insets = new Insets(0, 0, 5, 0);
+		gbc_lblBooks.gridx = 0;
+		gbc_lblBooks.gridy = 1;
+		frame.getContentPane().add(lblBooks, gbc_lblBooks);
+
+		BookList = new JList<String>(initBookListModel());
+		GridBagConstraints gbc_BookList_1 = new GridBagConstraints();
+		gbc_BookList_1.fill = GridBagConstraints.BOTH;
+		gbc_BookList_1.gridx = 0;
+		gbc_BookList_1.gridy = 2;
+		frame.getContentPane().add(BookList, gbc_BookList_1);
+
 		// constantly check for kindle
 		ScheduledExecutorService ses = Executors.newScheduledThreadPool(1);
 		ses.schedule(new Runnable() {
@@ -68,18 +109,40 @@ public class MainApp {
 				}
 			}
 		}, 0, TimeUnit.MILLISECONDS);
-		listenForKindle();
+
 	}
-	
-	private static String getDocumentsDirectory(){
+
+	ListModel<String> initBookListModel() {
+		Library localBooks = null;
+		try {
+			localBooks = new Library(getManifestFileLocation());
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(frame,
+					"Error getting book list!\nPlease restart");
+			e.printStackTrace();
+			return null;
+		}
+		List<Book> books = localBooks.getBooks();
+
+		DefaultListModel<String> listModel = new DefaultListModel<String>();
+		for (Book b : books) {
+			listModel.addElement(b.getTitle() + "-" + b.getAuthor());
+		}
+
+		return listModel;
+
+	}
+
+	private static String getDocumentsDirectory() {
 		JFileChooser fr = new JFileChooser();
 		FileSystemView fw = fr.getFileSystemView();
 		return fw.getDefaultDirectory().toString();
 	}
-	
-	private static String getManifestFileLocation(){
+
+	private static String getManifestFileLocation() {
 		// possibly one level too high for mac
-		return getDocumentsDirectory() + File.separator + "ebooks" + File.separator + "thingToRead.xml";
+		return getDocumentsDirectory() + File.separator + "ebooks"
+				+ File.separator + "thingToRead.xml";
 	}
 
 	private void onKindleDisconnected() {
@@ -88,8 +151,7 @@ public class MainApp {
 
 	private void onKindleConnected() {
 		lblKindleStatus.setText("Kindle connected");
-		
-		
+
 	}
 
 	private void listenForKindle() {
