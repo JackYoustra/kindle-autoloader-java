@@ -1,7 +1,9 @@
 package com.jackyoustra.kautoload;
 
-import java.awt.BorderLayout;
 import java.awt.EventQueue;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.io.File;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -12,22 +14,18 @@ import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.ListModel;
-import javax.swing.filechooser.FileSystemView;
-import javax.swing.JList;
-
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
 import javax.swing.SwingConstants;
+import javax.swing.filechooser.FileSystemView;
 
 public class MainApp {
 
 	private JFrame frame;
 	private JLabel lblKindleStatus;
 	private boolean kindleConnected = false;
-	private JList BookList;
+	private JList<String> BookList;
 	private JLabel lblBooks;
 
 	/**
