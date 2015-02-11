@@ -19,6 +19,9 @@ import javax.swing.JOptionPane;
 import javax.swing.ListModel;
 import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileSystemView;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JPanel;
 
 public class MainApp {
 
@@ -27,6 +30,8 @@ public class MainApp {
 	private boolean kindleConnected = false;
 	private JList<String> BookList;
 	private JLabel lblBooks;
+	private JTabbedPane tabbedPane;
+	private JPanel infopanel;
 
 	/**
 	 * Launch the application.
@@ -60,10 +65,10 @@ public class MainApp {
 		frame.setBounds(100, 100, 450, 300);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		GridBagLayout gridBagLayout = new GridBagLayout();
-		gridBagLayout.columnWidths = new int[] { 434, 0 };
-		gridBagLayout.rowHeights = new int[] { 14, 0, 248, 0 };
-		gridBagLayout.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
-		gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 1.0, Double.MIN_VALUE };
+		gridBagLayout.columnWidths = new int[] { 434, 0, 0, 0 };
+		gridBagLayout.rowHeights = new int[] { 14, 0, 0, 248, 0 };
+		gridBagLayout.columnWeights = new double[] { 1.0, 1.0, 0.0, Double.MIN_VALUE };
+		gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 1.0, 1.0, Double.MIN_VALUE };
 		frame.getContentPane().setLayout(gridBagLayout);
 
 		lblKindleStatus = new JLabel("Kindle Not Connected");
@@ -71,7 +76,7 @@ public class MainApp {
 		GridBagConstraints gbc_lblKindleStatus = new GridBagConstraints();
 		gbc_lblKindleStatus.anchor = GridBagConstraints.NORTH;
 		gbc_lblKindleStatus.fill = GridBagConstraints.HORIZONTAL;
-		gbc_lblKindleStatus.insets = new Insets(0, 0, 5, 0);
+		gbc_lblKindleStatus.insets = new Insets(0, 0, 5, 5);
 		gbc_lblKindleStatus.gridx = 0;
 		gbc_lblKindleStatus.gridy = 0;
 		frame.getContentPane().add(lblKindleStatus, gbc_lblKindleStatus);
@@ -79,17 +84,31 @@ public class MainApp {
 		lblBooks = new JLabel("Books:");
 		lblBooks.setHorizontalAlignment(SwingConstants.LEFT);
 		GridBagConstraints gbc_lblBooks = new GridBagConstraints();
-		gbc_lblBooks.insets = new Insets(0, 0, 5, 0);
+		gbc_lblBooks.insets = new Insets(0, 0, 5, 5);
 		gbc_lblBooks.gridx = 0;
 		gbc_lblBooks.gridy = 1;
 		frame.getContentPane().add(lblBooks, gbc_lblBooks);
 
-		BookList = new JList<String>(initBookListModel());
+		ListModel<String> blm = initBookListModel();
+		BookList = new JList<String>(blm);
 		GridBagConstraints gbc_BookList_1 = new GridBagConstraints();
+		gbc_BookList_1.insets = new Insets(0, 0, 0, 5);
 		gbc_BookList_1.fill = GridBagConstraints.BOTH;
 		gbc_BookList_1.gridx = 0;
-		gbc_BookList_1.gridy = 2;
+		gbc_BookList_1.gridy = 3;
 		frame.getContentPane().add(BookList, gbc_BookList_1);
+		
+		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		GridBagConstraints gbc_tabbedPane = new GridBagConstraints();
+		gbc_tabbedPane.gridheight = 4;
+		gbc_tabbedPane.gridwidth = 2;
+		gbc_tabbedPane.fill = GridBagConstraints.BOTH;
+		gbc_tabbedPane.gridx = 1;
+		gbc_tabbedPane.gridy = 0;
+		frame.getContentPane().add(tabbedPane, gbc_tabbedPane);
+		
+		infopanel = new JPanel();
+		tabbedPane.addTab("Info", null, infopanel, null);
 		
 		// constantly check for kindle
 		ScheduledExecutorService ses = Executors.newScheduledThreadPool(1);
