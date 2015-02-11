@@ -92,12 +92,17 @@ public class MainApp {
 		gbc_BookList_1.gridx = 0;
 		gbc_BookList_1.gridy = 2;
 		frame.getContentPane().add(BookList, gbc_BookList_1);
-
+		
 		// constantly check for kindle
 		ScheduledExecutorService ses = Executors.newScheduledThreadPool(1);
 		ses.schedule(new Runnable() {
 			@Override
 			public void run() {
+				// startup check to be accurate
+				kindleConnected = false;
+				listenForKindle();
+				kindleConnected = true;
+				listenForKindle();
 				while (true) {
 					listenForKindle();
 					try {
@@ -126,7 +131,7 @@ public class MainApp {
 
 		DefaultListModel<String> listModel = new DefaultListModel<String>();
 		for (Book b : books) {
-			listModel.addElement(b.getTitle() + "-" + b.getAuthor());
+			listModel.addElement(b.getTitle() + " - " + b.getAuthor());
 		}
 
 		return listModel;
@@ -147,11 +152,12 @@ public class MainApp {
 
 	private void onKindleDisconnected() {
 		lblKindleStatus.setText("Kindle not connected!");
+		BookList.setEnabled(false);
 	}
 
 	private void onKindleConnected() {
 		lblKindleStatus.setText("Kindle connected");
-
+		BookList.setEnabled(true);
 	}
 
 	private void listenForKindle() {
