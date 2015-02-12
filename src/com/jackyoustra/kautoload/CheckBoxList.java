@@ -20,6 +20,21 @@ public class CheckBoxList extends JList {
 
 		addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
+				// reset to false
+				final int size = getModel().getSize();
+				for(int i = 0; i < size; i++){
+					JCheckBox checkbox = (JCheckBox) getModel().getElementAt(i);
+					checkbox.setSelected(false);
+				}
+				
+				int[] selectedIndicies = getSelectedIndices();
+				for(int selectedIndex : selectedIndicies){
+					JCheckBox checkbox = (JCheckBox) getModel().getElementAt(selectedIndex);
+					checkbox.setSelected(!checkbox.isSelected());
+				}
+				
+				repaint();
+				/*
 				int index = locationToIndex(e.getPoint());
 
 				if (index != -1) {
@@ -27,10 +42,11 @@ public class CheckBoxList extends JList {
 					checkbox.setSelected(!checkbox.isSelected());
 					repaint();
 				}
+				*/
 			}
 		});
 
-		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		//setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 	}
 
 	protected class CellRenderer implements ListCellRenderer {
