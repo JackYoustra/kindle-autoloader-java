@@ -5,12 +5,14 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import javax.swing.DefaultListModel;
+import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -22,6 +24,7 @@ import javax.swing.filechooser.FileSystemView;
 import javax.swing.JTabbedPane;
 import javax.swing.JPanel;
 import javax.swing.JButton;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -30,7 +33,7 @@ public class MainApp {
 	private JFrame frame;
 	private JLabel lblKindleStatus;
 	private boolean kindleConnected = false;
-	private JList<String> BookList;
+	private CheckBoxList BookList;
 	private JLabel lblBooks;
 	private JTabbedPane tabbedPane;
 	private JPanel infopanel;
@@ -94,8 +97,27 @@ public class MainApp {
 		gbc_lblBooks.gridy = 1;
 		frame.getContentPane().add(lblBooks, gbc_lblBooks);
 
-		ListModel<String> blm = initBookListModel();
-		BookList = new JList<String>(blm);
+		
+		Library localBooks = null;
+		try {
+			localBooks = new Library(getManifestFileLocation());
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(frame,
+					"Error getting book list!\nPlease restart");
+			e.printStackTrace();
+		}
+		
+		List<Book> books = localBooks.getBooks();
+		List<JCheckBox> checkBoxList = new ArrayList<JCheckBox>(books.size());
+		for(Book currentBook : books){
+			checkBoxList.add(new JCheckBox(currentBook.getTitle() + " - " + currentBook.getAuthor()));
+		}
+		BookList = new CheckBoxList();
+		JCheckBox[] b = new JCheckBox[checkBoxList.size()];
+		b = checkBoxList.toArray(b);
+		BookList.setListData(b);   // set the list data for the object
+		
+		
 		GridBagConstraints gbc_BookList_1 = new GridBagConstraints();
 		gbc_BookList_1.insets = new Insets(0, 0, 0, 5);
 		gbc_BookList_1.fill = GridBagConstraints.BOTH;
@@ -171,27 +193,6 @@ public class MainApp {
 				}
 			}
 		}, 0, TimeUnit.MILLISECONDS);
-
-	}
-
-	ListModel<String> initBookListModel() {
-		Library localBooks = null;
-		try {
-			localBooks = new Library(getManifestFileLocation());
-		} catch (Exception e) {
-			JOptionPane.showMessageDialog(frame,
-					"Error getting book list!\nPlease restart");
-			e.printStackTrace();
-			return null;
-		}
-		List<Book> books = localBooks.getBooks();
-
-		DefaultListModel<String> listModel = new DefaultListModel<String>();
-		for (Book b : books) {
-			listModel.addElement(b.getTitle() + " - " + b.getAuthor());
-		}
-
-		return listModel;
 
 	}
 
