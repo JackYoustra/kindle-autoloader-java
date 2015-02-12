@@ -51,7 +51,7 @@ public class Library {
 	/**
 	 * Gets the books.
 	 *
-	 * @return A deep copy of all of the books in the library
+	 * @return A shallow (plz don't edit, things'll break!!!) copy of all of the books in the library
 	 */
 	public List<Book> getBooks() {
 		return new ArrayList<Book>(books);

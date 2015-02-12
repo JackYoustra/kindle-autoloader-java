@@ -3,6 +3,7 @@ package com.jackyoustra.kautoload;
 import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Arrays;
 
 import javax.swing.JCheckBox;
 import javax.swing.JList;
@@ -14,12 +15,17 @@ import javax.swing.border.EmptyBorder;
 
 public class CheckBoxList extends JList {
 	protected static Border noFocusBorder = new EmptyBorder(1, 1, 1, 1);
-
+	private int[] prevSelectIndicies = {-1};
+	
 	public CheckBoxList() {
 		setCellRenderer(new CellRenderer());
 
 		addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
+				if(Arrays.equals(getSelectedIndices(), prevSelectIndicies)){
+					clearSelection();
+				}
+				prevSelectIndicies = getSelectedIndices();
 				// reset to false
 				final int size = getModel().getSize();
 				for(int i = 0; i < size; i++){
