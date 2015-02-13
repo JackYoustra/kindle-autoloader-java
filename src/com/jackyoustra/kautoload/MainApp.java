@@ -25,18 +25,37 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileSystemView;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class MainApp.
+ */
 public class MainApp {
 
+	/** The kindle path. */
 	private static String kindlePath;
+	
+	/** The frame. */
 	private JFrame frame;
+	
+	/** The lbl kindle status. */
 	private JLabel lblKindleStatus;
+	
+	/** The kindle connected. */
 	private boolean kindleConnected = false;
+	
+	/** The Book list. */
 	private CheckBoxList BookList;
+	
+	/** The lbl books. */
 	private JLabel lblBooks;
+	
+	/** The btn download. */
 	private JButton btnDownload;
 
 	/**
 	 * Launch the application.
+	 *
+	 * @param args the arguments
 	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -128,6 +147,9 @@ public class MainApp {
 							// same thing, can download book
 							try {
 								currentBook.saveToPath(getKindleDocumentsDirectory(), getEbooksFileFolder());
+								refreshKindleList();
+								currentCheckBox.setSelected(false);
+								BookList.clearSelection();
 							} catch (IOException e) {
 								JOptionPane.showMessageDialog(frame,
 										"Error saving book list!");
@@ -170,6 +192,11 @@ public class MainApp {
 
 	}
 
+	/**
+	 * Gets the documents directory.
+	 *
+	 * @return the documents directory
+	 */
 	private static String getDocumentsDirectory() {
 		// possibly one level too high for mac
 		JFileChooser fr = new JFileChooser();
@@ -177,18 +204,36 @@ public class MainApp {
 		return fw.getDefaultDirectory().toString() + File.separator;
 	}
 	
+	/**
+	 * Gets the ebooks file folder.
+	 *
+	 * @return the ebooks file folder
+	 */
 	private static String getEbooksFileFolder(){
 		return getDocumentsDirectory() + "ebooks" + File.separator;
 	}
 
+	/**
+	 * Gets the manifest file location.
+	 *
+	 * @return the manifest file location
+	 */
 	private static String getManifestFileLocation() {
 		return getEbooksFileFolder() + "thingToRead.xml";
 	}
 	
+	/**
+	 * Gets the kindle documents directory.
+	 *
+	 * @return the kindle documents directory
+	 */
 	private static String getKindleDocumentsDirectory(){
 		return kindlePath + File.separator + "documents" + File.separator;
 	}
 
+	/**
+	 * On kindle disconnected.
+	 */
 	private void onKindleDisconnected() {
 		lblKindleStatus.setText("Kindle not connected!");
 		BookList.setSelectedIndex(-1);
@@ -196,11 +241,21 @@ public class MainApp {
 		btnDownload.setEnabled(false);
 	}
 
+	/**
+	 * On kindle connected.
+	 */
 	private void onKindleConnected() {
 		lblKindleStatus.setText("Kindle connected");
 		BookList.setEnabled(true);
 		btnDownload.setEnabled(true);
 		
+		refreshKindleList();
+	}
+
+	/**
+	 * Refresh the eligibility of books based on the loaded state of the kindle.
+	 */
+	private void refreshKindleList() {
 		List<Book> bookList = BookList.getUnderlyingLibrary().getBooks();
 		
 		for(int i = 0; i < bookList.size(); i++){
@@ -228,6 +283,9 @@ public class MainApp {
 		BookList.repaint();
 	}
 
+	/**
+	 * Listen for kindle.
+	 */
 	private void listenForKindle() {
 		FileSystemView fsv = FileSystemView.getFileSystemView();
 		File[] f = File.listRoots();
