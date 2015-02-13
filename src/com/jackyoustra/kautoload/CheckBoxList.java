@@ -20,6 +20,7 @@ import javax.swing.border.EmptyBorder;
 public class CheckBoxList extends JList {
 	protected static Border noFocusBorder = new EmptyBorder(1, 1, 1, 1);
 	private int[] prevSelectIndicies = {-1};
+	private int prevDragIndex = -1;
 	private Library underlyingLibrary;
 	
 	/** Annoying hack to get checkbox working */
@@ -32,18 +33,28 @@ public class CheckBoxList extends JList {
 		
 		MouseAdapter ma = new MouseAdapter() {
 			public void mouseDragged(MouseEvent e) {
-				this.mousePressed(e);
+				int index = locationToIndex(e.getPoint());
+				if(index != prevDragIndex){
+					prevDragIndex = index;
+					this.mousePressed(e);
+				}
 			}
 			public void mousePressed(MouseEvent e) {
+				prevDragIndex = locationToIndex(e.getPoint());
 				if(Arrays.equals(getSelectedIndices(), prevSelectIndicies)){
 					clearSelection();
+					for(int i = 0; i < prevSelectIndicies.length; i++){
+						int selectedIndex = prevSelectIndicies[i];
+						JCheckBox checkbox = (JCheckBox) getModel().getElementAt(selectedIndex);
+						checkbox.setSelected(false);
+					}
 				}
 				prevSelectIndicies = getSelectedIndices();
 				// reset to false
 				final int size = getModel().getSize();
 				for(int i = 0; i < size; i++){
 					JCheckBox checkbox = (JCheckBox) getModel().getElementAt(i);
-					checkbox.setSelected(false);
+					checkbox.setSelected(checkbox.isSelected());
 				}
 				
 				int[] selectedIndicies = getSelectedIndices();
@@ -51,7 +62,7 @@ public class CheckBoxList extends JList {
 					int selectedIndex = selectedIndicies[i];
 					JCheckBox checkbox = (JCheckBox) getModel().getElementAt(selectedIndex);
 					if(checkbox.isEnabled()){
-						checkbox.setSelected(true);
+						checkbox.setSelected(!checkbox.isSelected());
 					}
 					else{
 						removeSelectionInterval(i, i);
