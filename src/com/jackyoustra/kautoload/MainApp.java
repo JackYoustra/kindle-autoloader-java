@@ -3,6 +3,7 @@ package com.jackyoustra.kautoload;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,6 +16,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
@@ -24,6 +26,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileSystemView;
+
+import java.awt.Toolkit;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -83,6 +87,14 @@ public class MainApp {
 	private void initialize() {
 
 		frame = new JFrame();
+		// set image icons
+		List<Image> icons = new ArrayList<Image>();
+		icons.add(Toolkit.getDefaultToolkit().getImage(MainApp.class.getResource("/assets/KindleXferIcon 128x128.png")));
+		icons.add(Toolkit.getDefaultToolkit().getImage(MainApp.class.getResource("/assets/KindleXferIcon 64x64.png")));
+		icons.add(Toolkit.getDefaultToolkit().getImage(MainApp.class.getResource("/assets/KindleXferIcon 32x32.png")));
+		icons.add(Toolkit.getDefaultToolkit().getImage(MainApp.class.getResource("/assets/KindleXferIcon 16x16.png")));
+		frame.setIconImages(icons);
+		// end set
 		frame.setBounds(100, 100, 454, 297);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		GridBagLayout gridBagLayout = new GridBagLayout();
