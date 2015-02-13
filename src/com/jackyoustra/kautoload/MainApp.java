@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -20,12 +21,13 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileSystemView;
 
 public class MainApp {
 
-	private String kindlePath;
+	private static String kindlePath;
 	private JFrame frame;
 	private JLabel lblKindleStatus;
 	private boolean kindleConnected = false;
@@ -104,7 +106,7 @@ public class MainApp {
 		for(Book currentBook : books){
 			checkBoxList.add(new JCheckBox(currentBook.getDisplayTitle()));
 		}
-		BookList = new CheckBoxList();
+		BookList = new CheckBoxList(localBooks);
 		JCheckBox[] b = new JCheckBox[checkBoxList.size()];
 		b = checkBoxList.toArray(b);
 		BookList.setListData(b);   // set the list data for the object
@@ -125,7 +127,7 @@ public class MainApp {
 						if(currentCheckBox.getText().equals(currentBook.getDisplayTitle())){
 							// same thing, can download book
 							try {
-								currentBook.saveToPath(kindlePath + File.separator + "documents" + File.separator, getEbooksFileFolder());
+								currentBook.saveToPath(getKindleDocumentsDirectory(), getEbooksFileFolder());
 							} catch (IOException e) {
 								JOptionPane.showMessageDialog(frame,
 										"Error saving book list!");
@@ -182,6 +184,10 @@ public class MainApp {
 	private static String getManifestFileLocation() {
 		return getEbooksFileFolder() + "thingToRead.xml";
 	}
+	
+	private static String getKindleDocumentsDirectory(){
+		return kindlePath + File.separator + "documents" + File.separator;
+	}
 
 	private void onKindleDisconnected() {
 		lblKindleStatus.setText("Kindle not connected!");
@@ -194,6 +200,32 @@ public class MainApp {
 		lblKindleStatus.setText("Kindle connected");
 		BookList.setEnabled(true);
 		btnDownload.setEnabled(true);
+		
+		List<Book> bookList = BookList.getUnderlyingLibrary().getBooks();
+		
+		for(int i = 0; i < bookList.size(); i++){
+			Book currentBook = bookList.get(i);
+			JCheckBox currentElement = (JCheckBox) BookList.getModel().getElementAt(i);
+			
+			System.out.println(getKindleDocumentsDirectory());
+			File[] kindleDocuments = new File(getKindleDocumentsDirectory()).listFiles();
+			for(File currentFile : kindleDocuments){
+				final String[] pathComponents = currentFile.toString().split("\\\\");
+				final String finalPathName = pathComponents[pathComponents.length-1];
+				if(finalPathName.equals(currentBook.getFilename())){
+					// is equal, plz disable
+					BookList.checkboxHashMap.put(currentElement, false);
+					//currentElement.setEnabled(false);
+					break;
+				}
+				else{
+					BookList.checkboxHashMap.put(currentElement, true);
+					//currentElement.setEnabled(true);
+				}
+			}
+			System.out.println(currentElement.isEnabled());
+		}
+		BookList.repaint();
 	}
 
 	private void listenForKindle() {

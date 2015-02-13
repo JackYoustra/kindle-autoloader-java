@@ -3,7 +3,11 @@ package com.jackyoustra.kautoload;
 import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.swing.JCheckBox;
 import javax.swing.JList;
@@ -16,11 +20,20 @@ import javax.swing.border.EmptyBorder;
 public class CheckBoxList extends JList {
 	protected static Border noFocusBorder = new EmptyBorder(1, 1, 1, 1);
 	private int[] prevSelectIndicies = {-1};
+	private Library underlyingLibrary;
 	
-	public CheckBoxList() {
+	/** Annoying hack to get checkbox working */
+	public Map<JCheckBox, Boolean> checkboxHashMap = new HashMap<JCheckBox, Boolean>();
+	
+	public CheckBoxList(Library lib) {
 		setCellRenderer(new CellRenderer());
 
-		addMouseListener(new MouseAdapter() {
+		underlyingLibrary = lib;
+		
+		MouseAdapter ma = new MouseAdapter() {
+			public void mouseDragged(MouseEvent e) {
+				this.mousePressed(e);
+			}
 			public void mousePressed(MouseEvent e) {
 				if(Arrays.equals(getSelectedIndices(), prevSelectIndicies)){
 					clearSelection();
@@ -34,9 +47,15 @@ public class CheckBoxList extends JList {
 				}
 				
 				int[] selectedIndicies = getSelectedIndices();
-				for(int selectedIndex : selectedIndicies){
+				for(int i = 0; i < selectedIndicies.length; i++){
+					int selectedIndex = selectedIndicies[i];
 					JCheckBox checkbox = (JCheckBox) getModel().getElementAt(selectedIndex);
-					checkbox.setSelected(!checkbox.isSelected());
+					if(checkbox.isEnabled()){
+						checkbox.setSelected(true);
+					}
+					else{
+						removeSelectionInterval(i, i);
+					}
 				}
 				
 				repaint();
@@ -50,9 +69,17 @@ public class CheckBoxList extends JList {
 				}
 				*/
 			}
-		});
+			
+		};
+		
+		addMouseListener(ma);
+		addMouseMotionListener(ma);
 
 		//setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+	}
+	
+	public Library getUnderlyingLibrary() {
+		return underlyingLibrary;
 	}
 
 	protected class CellRenderer implements ListCellRenderer {
@@ -61,7 +88,12 @@ public class CheckBoxList extends JList {
 			JCheckBox checkbox = (JCheckBox) value;
 			checkbox.setBackground(isSelected ? getSelectionBackground() : getBackground());
 			checkbox.setForeground(isSelected ? getSelectionForeground() : getForeground());
-			checkbox.setEnabled(isEnabled());
+			if(checkboxHashMap.containsKey(checkbox)){
+				checkbox.setEnabled(checkboxHashMap.get(checkbox));
+			}
+			else{
+				checkbox.setEnabled(isEnabled());
+			}
 			checkbox.setFont(getFont());
 			checkbox.setFocusPainted(false);
 			checkbox.setBorderPainted(true);
