@@ -134,7 +134,6 @@ public class MainApp {
 		gbc_lblBooks.gridy = 1;
 		frmKindleAutoloader.getContentPane().add(lblBooks, gbc_lblBooks);
 
-		
 		Library localBooks = null;
 		try {
 			localBooks = new Library(getManifestFileLocation());
@@ -206,6 +205,7 @@ public class MainApp {
 		if(SystemTray.isSupported()){
 			final PopupMenu popup = new PopupMenu();
 			trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage(MainApp.class.getResource("/assets/KindleXferIcon 16x16.png")));
+			trayIcon.setImageAutoSize(true);
 			final SystemTray tray = SystemTray.getSystemTray();
 			
 			MenuItem openItem = new MenuItem("Open");
@@ -276,6 +276,9 @@ public class MainApp {
 		// possibly one level too high for mac
 		JFileChooser fr = new JFileChooser();
 		FileSystemView fw = fr.getFileSystemView();
+		if(System.getProperty("os.name").contains("Mac OS")){
+			return fw.getDefaultDirectory().toString() + File.separator + "Documents" + File.separator;
+		}
 		return fw.getDefaultDirectory().toString() + File.separator;
 	}
 	
