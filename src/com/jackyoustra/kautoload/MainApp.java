@@ -1,10 +1,16 @@
 package com.jackyoustra.kautoload;
 
+import java.awt.AWTException;
 import java.awt.EventQueue;
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.MenuItem;
+import java.awt.PopupMenu;
+import java.awt.SystemTray;
+import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -203,6 +209,45 @@ public class MainApp {
 				}
 			}
 		}, 0, TimeUnit.MILLISECONDS);
+		
+		// create popup menu
+		if(SystemTray.isSupported()){
+			final JFrame parentFrame = frmKindleAutoloader;
+			final PopupMenu popup = new PopupMenu();
+			final TrayIcon trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage(MainApp.class.getResource("/assets/KindleXferIcon 16x16.png")));
+			final SystemTray tray = SystemTray.getSystemTray();
+			
+			MenuItem openItem = new MenuItem("Open");
+			
+			openItem.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					parentFrame.setExtendedState(Frame.NORMAL);
+				}
+			});
+			
+			MenuItem exitItem = new MenuItem("Exit");
+			exitItem.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					System.exit(0);
+				}
+			});
+			
+			popup.add(openItem);
+			popup.add(exitItem);
+			
+			trayIcon.setPopupMenu(popup);
+			try {
+				tray.add(trayIcon);
+			} catch (AWTException e) {
+				// TODO Auto-generated catch block
+				System.out.println("tray icon not added");
+				e.printStackTrace();
+			}
+		}
 
 	}
 

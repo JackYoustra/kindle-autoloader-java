@@ -54,7 +54,9 @@ public class CheckBoxList extends JList {
 				final int size = getModel().getSize();
 				for(int i = 0; i < size; i++){
 					JCheckBox checkbox = (JCheckBox) getModel().getElementAt(i);
-					checkbox.setSelected(checkbox.isSelected());
+					if(checkbox.isEnabled()){
+						checkbox.setSelected(checkbox.isSelected());
+					}
 				}
 				
 				int[] selectedIndicies = getSelectedIndices();
