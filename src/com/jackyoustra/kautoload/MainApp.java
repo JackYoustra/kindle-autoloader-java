@@ -11,8 +11,11 @@ import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
+import java.awt.TrayIcon.MessageType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -61,6 +64,8 @@ public class MainApp {
 	
 	/** The btn download. */
 	private JButton btnDownload;
+	
+	TrayIcon trayIcon;
 
 	/**
 	 * Launch the application.
@@ -189,32 +194,18 @@ public class MainApp {
 		gbc_BookList_1.gridy = 2;
 		frmKindleAutoloader.getContentPane().add(BookList, gbc_BookList_1);
 		
-		// constantly check for kindle
-		ScheduledExecutorService ses = Executors.newScheduledThreadPool(1);
-		ses.schedule(new Runnable() {
+		frmKindleAutoloader.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		frmKindleAutoloader.addWindowListener(new WindowAdapter() {
 			@Override
-			public void run() {
-				// startup check to be accurate
-				kindleConnected = false;
-				listenForKindle();
-				kindleConnected = true;
-				listenForKindle();
-				while (true) {
-					listenForKindle();
-					try {
-						Thread.sleep(500);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
+			public void windowClosing(WindowEvent e) {
+				frmKindleAutoloader.setVisible(false);
 			}
-		}, 0, TimeUnit.MILLISECONDS);
+		});
 		
 		// create popup menu
 		if(SystemTray.isSupported()){
-			final JFrame parentFrame = frmKindleAutoloader;
 			final PopupMenu popup = new PopupMenu();
-			final TrayIcon trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage(MainApp.class.getResource("/assets/KindleXferIcon 16x16.png")));
+			trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage(MainApp.class.getResource("/assets/KindleXferIcon 16x16.png")));
 			final SystemTray tray = SystemTray.getSystemTray();
 			
 			MenuItem openItem = new MenuItem("Open");
@@ -223,7 +214,7 @@ public class MainApp {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					parentFrame.setExtendedState(Frame.NORMAL);
+					maximizeFrame();
 				}
 			});
 			
@@ -248,9 +239,34 @@ public class MainApp {
 				e.printStackTrace();
 			}
 		}
-
+		
+		// constantly check for kindle
+		ScheduledExecutorService ses = Executors.newScheduledThreadPool(1);
+		ses.schedule(new Runnable() {
+			@Override
+			public void run() {
+				// startup check to be accurate
+				kindleConnected = false;
+				listenForKindle();
+				kindleConnected = true;
+				listenForKindle();
+				while (true) {
+					listenForKindle();
+					try {
+						Thread.sleep(500);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}, 0, TimeUnit.MILLISECONDS);
 	}
 
+	public void maximizeFrame(){
+		frmKindleAutoloader.setVisible(true);
+		frmKindleAutoloader.setExtendedState(Frame.NORMAL);
+	}
+	
 	/**
 	 * Gets the documents directory.
 	 *
@@ -307,6 +323,18 @@ public class MainApp {
 		lblKindleStatus.setText("Kindle connected");
 		BookList.setEnabled(true);
 		btnDownload.setEnabled(true);
+		
+		if(!frmKindleAutoloader.isVisible()){
+			
+			trayIcon.displayMessage("Kindle Connected", "A Kindle has been connected", MessageType.INFO);
+			trayIcon.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					maximizeFrame();
+				}
+			});
+		}
 		
 		refreshKindleList();
 	}
