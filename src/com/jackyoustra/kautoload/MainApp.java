@@ -34,6 +34,8 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileSystemView;
 
 import java.awt.Toolkit;
@@ -96,6 +98,21 @@ public class MainApp {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
+		// mac stuff
+		if(isMac()){
+			// take the menu bar off the jframe
+			System.setProperty("apple.laf.useScreenMenuBar", "true");
+
+			// set the name of the application menu item
+			System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Kindle Autoloader");
+			// set the look and feel
+			try {
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
 
 		frmKindleAutoloader = new JFrame();
 		frmKindleAutoloader.setTitle("Kindle Autoloader");
@@ -267,6 +284,10 @@ public class MainApp {
 		frmKindleAutoloader.setExtendedState(Frame.NORMAL);
 	}
 	
+	private static boolean isMac(){
+		return System.getProperty("os.name").contains("Mac OS");
+	}
+	
 	/**
 	 * Gets the documents directory.
 	 *
@@ -276,7 +297,7 @@ public class MainApp {
 		// possibly one level too high for mac
 		JFileChooser fr = new JFileChooser();
 		FileSystemView fw = fr.getFileSystemView();
-		if(System.getProperty("os.name").contains("Mac OS")){
+		if(isMac()){
 			return fw.getDefaultDirectory().toString() + File.separator + "Documents" + File.separator;
 		}
 		return fw.getDefaultDirectory().toString() + File.separator;
