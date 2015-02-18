@@ -376,7 +376,7 @@ public class MainApp {
 			System.out.println(getKindleDocumentsDirectory());
 			File[] kindleDocuments = new File(getKindleDocumentsDirectory()).listFiles();
 			for(File currentFile : kindleDocuments){
-				final String[] pathComponents = currentFile.toString().split("\\\\");
+				final String[] pathComponents = currentFile.toString().split(File.separator);
 				final String finalPathName = pathComponents[pathComponents.length-1];
 				if(finalPathName.equals(currentBook.getFilename())){
 					// is equal, plz disable
@@ -400,12 +400,15 @@ public class MainApp {
 	private void listenForKindle() {
 		FileSystemView fsv = FileSystemView.getFileSystemView();
 		File[] f = File.listRoots();
+		
+		if(isMac()){
+			f = new File("/Volumes").listFiles();
+		}
+		
 		boolean success = false;
 		for (int i = 0; i < f.length; i++) {
 			// check if the drive is a kindle
-			
-			if (fsv.getSystemDisplayName(f[i]).toLowerCase().contains("kindle")
-					&& fsv.isDrive(f[i]) && f[i].canRead() && f[i].canWrite()) {
+			if (fsv.getSystemDisplayName(f[i]).toLowerCase().contains("kindle") && f[i].canRead() && f[i].canWrite()) {
 				// bet bet that it is
 				kindlePath = f[i].getPath();
 				success = true;
@@ -416,13 +419,13 @@ public class MainApp {
 			}
 
 			/*
-			 * System.out.println("Drive: " + f[i]);
-			 * System.out.println("Display name: " +
-			 * fsv.getSystemDisplayName(f[i])); System.out.println("Is drive: "
-			 * + fsv.isDrive(f[i])); System.out.println("Is floppy: " +
-			 * fsv.isFloppyDrive(f[i])); System.out.println("Readable: " +
-			 * f[i].canRead()); System.out.println("Writable: " +
-			 * f[i].canWrite());
+			  System.out.println("Drive: " + f[i]);
+			  System.out.println("Display name: " +
+			  fsv.getSystemDisplayName(f[i])); System.out.println("Is drive: "
+			  + fsv.isDrive(f[i])); System.out.println("Is floppy: " +
+			  fsv.isFloppyDrive(f[i])); System.out.println("Readable: " +
+			  f[i].canRead()); System.out.println("Writable: " +
+			  f[i].canWrite());
 			 */
 		}
 		if (kindleConnected && success == false) {
