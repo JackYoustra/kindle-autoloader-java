@@ -1,16 +1,18 @@
 package com.jackyoustra.kautoload;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
+import java.net.URL;
 
 public class Book {
 	private String title;
 	private String author;
 	private String filename;
+	private URL downloadLocation;
+	private int size; // in kb
 	
 	public Book(String title, String author, String filename) {
 		this.title = title;
@@ -18,6 +20,14 @@ public class Book {
 		this.filename = filename;
 	}
 	
+	public Book(String title, String author, String filename, URL downloadLocation, int size) {
+		this.title = title;
+		this.author = author;
+		this.filename = filename;
+		this.downloadLocation = downloadLocation;
+		this.size = size;
+	}
+
 	public String getTitle() {
 		return title;
 	}
@@ -30,10 +40,18 @@ public class Book {
 		return filename;
 	}
 
+	public URL getDownloadLocation() {
+		return downloadLocation;
+	}
+	
+	public int getSize() {
+		return size;
+	}
+	
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
-		return this.title + "\n" + this.author + "\n" + this.filename;
+		return this.title + "\n" + this.author + "\n" + this.filename + " (" + size + "kb)";
 	}
 
 	public String getDisplayTitle() {
