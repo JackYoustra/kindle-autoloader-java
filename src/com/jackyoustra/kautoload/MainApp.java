@@ -9,6 +9,7 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
+import java.awt.ScrollPane;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.TrayIcon.MessageType;
@@ -37,14 +38,20 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileSystemView;
+import javax.swing.table.TableModel;
 
 import java.awt.Toolkit;
+
 import javax.swing.JTextField;
+
 import java.awt.Color;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -64,14 +71,14 @@ public class MainApp {
 	/** The kindle connected. */
 	private boolean kindleConnected = false;
 	
-	/** The Book list. */
-	private CheckBoxList BookList;
-	
 	/** The btn download. */
 	private JButton btnDownload;
 	
 	TrayIcon trayIcon;
 	private JTextField txtSearch;
+	private JScrollPane scrollPane;
+	private JTable table;
+	private LibgenTableModel tableModel = new LibgenTableModel();
 
 	/**
 	 * Launch the application.
@@ -132,9 +139,9 @@ public class MainApp {
 		frmKindleAutoloader.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] { 434, 0 };
-		gridBagLayout.rowHeights = new int[] { 14, 0, 160, 0, 0 };
+		gridBagLayout.rowHeights = new int[] { 14, 0, 160, 0, 0, 0 };
 		gridBagLayout.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
-		gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE };
+		gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 1.0, 0.0, 1.0, Double.MIN_VALUE };
 		frmKindleAutoloader.getContentPane().setLayout(gridBagLayout);
 
 		lblKindleStatus = new JLabel("Kindle Not Connected");
@@ -161,12 +168,24 @@ public class MainApp {
 		for(Book currentBook : books){
 			checkBoxList.add(new JCheckBox(currentBook.getDisplayTitle()));
 		}
-		BookList = new CheckBoxList(localBooks);
-		JCheckBox[] b = new JCheckBox[checkBoxList.size()];
-		b = checkBoxList.toArray(b);
-		BookList.setListData(b);   // set the list data for the object
 		
 		txtSearch = new JTextField();
+		txtSearch.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					Book[] books = Libgen.search(txtSearch.getText());
+					tableModel.update(books);
+					
+				} catch (IOException e1) {
+					lblKindleStatus.setText("Internet Error");
+					lblKindleStatus.setForeground(Color.RED);
+					e1.printStackTrace();
+				}
+				
+			}
+		});
 		txtSearch.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(FocusEvent e) {
@@ -194,45 +213,28 @@ public class MainApp {
 		frmKindleAutoloader.getContentPane().add(txtSearch, gbc_txtSearch);
 		txtSearch.setColumns(10);
 		
+		table = new JTable(tableModel);
+		
+		scrollPane = new JScrollPane(table);
+		GridBagConstraints gbc_scrollPane = new GridBagConstraints();
+		gbc_scrollPane.insets = new Insets(0, 0, 5, 0);
+		gbc_scrollPane.fill = GridBagConstraints.BOTH;
+		gbc_scrollPane.gridx = 0;
+		gbc_scrollPane.gridy = 2;
+		frmKindleAutoloader.getContentPane().add(scrollPane, gbc_scrollPane);
+		
 		btnDownload = new JButton("Put on kindle");
 		GridBagConstraints gbc_btnDownload = new GridBagConstraints();
+		gbc_btnDownload.insets = new Insets(0, 0, 5, 0);
 		gbc_btnDownload.gridx = 0;
 		gbc_btnDownload.gridy = 3;
 		frmKindleAutoloader.getContentPane().add(btnDownload, gbc_btnDownload);
 		
-		final Library lambdaLocalBooks = localBooks;
 		btnDownload.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
-				// download button clicked
-				for(Book currentBook : lambdaLocalBooks.getBooks()){
-					for(int currentIndex = 0; currentIndex < BookList.getModel().getSize(); currentIndex++){
-						JCheckBox currentCheckBox = (JCheckBox) BookList.getModel().getElementAt(currentIndex);
-						if(currentCheckBox.isSelected()){
-							if(currentCheckBox.getText().equals(currentBook.getDisplayTitle())){
-								// same thing, can download book
-								try {
-									currentBook.saveToPath(getKindleDocumentsDirectory(), getEbooksFileFolder());
-									refreshKindleList();
-									currentCheckBox.setSelected(false);
-									BookList.clearSelection();
-								} catch (IOException e) {
-									JOptionPane.showMessageDialog(frmKindleAutoloader,
-											"Error saving book list!");
-									e.printStackTrace();
-								}
-							}
-						}
-					}
-				}
+
 			}
 		});
-		
-		GridBagConstraints gbc_BookList_1 = new GridBagConstraints();
-		gbc_BookList_1.insets = new Insets(0, 0, 5, 0);
-		gbc_BookList_1.fill = GridBagConstraints.BOTH;
-		gbc_BookList_1.gridx = 0;
-		gbc_BookList_1.gridy = 2;
-		frmKindleAutoloader.getContentPane().add(BookList, gbc_BookList_1);
 		
 		frmKindleAutoloader.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		frmKindleAutoloader.addWindowListener(new WindowAdapter() {
@@ -359,8 +361,6 @@ public class MainApp {
 	 */
 	private void onKindleDisconnected() {
 		lblKindleStatus.setText("Kindle not connected!");
-		BookList.setSelectedIndex(-1);
-		BookList.setEnabled(false);
 		btnDownload.setEnabled(false);
 	}
 
@@ -369,7 +369,6 @@ public class MainApp {
 	 */
 	private void onKindleConnected() {
 		lblKindleStatus.setText("Kindle connected");
-		BookList.setEnabled(true);
 		btnDownload.setEnabled(true);
 		
 		if(!frmKindleAutoloader.isVisible()){
@@ -383,39 +382,6 @@ public class MainApp {
 				}
 			});
 		}
-		
-		refreshKindleList();
-	}
-
-	/**
-	 * Refresh the eligibility of books based on the loaded state of the kindle.
-	 */
-	private void refreshKindleList() {
-		List<Book> bookList = BookList.getUnderlyingLibrary().getBooks();
-		
-		for(int i = 0; i < bookList.size(); i++){
-			Book currentBook = bookList.get(i);
-			JCheckBox currentElement = (JCheckBox) BookList.getModel().getElementAt(i);
-			
-			System.out.println(getKindleDocumentsDirectory());
-			File[] kindleDocuments = new File(getKindleDocumentsDirectory()).listFiles();
-			for(File currentFile : kindleDocuments){
-				final String[] pathComponents = currentFile.toString().split(File.separator);
-				final String finalPathName = pathComponents[pathComponents.length-1];
-				if(finalPathName.equals(currentBook.getFilename())){
-					// is equal, plz disable
-					BookList.checkboxHashMap.put(currentElement, false);
-					//currentElement.setEnabled(false);
-					break;
-				}
-				else{
-					BookList.checkboxHashMap.put(currentElement, true);
-					//currentElement.setEnabled(true);
-				}
-			}
-			System.out.println(currentElement.isEnabled());
-		}
-		BookList.repaint();
 	}
 
 	/**
