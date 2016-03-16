@@ -39,6 +39,12 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileSystemView;
 
 import java.awt.Toolkit;
+import javax.swing.JTextField;
+import java.awt.Color;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -61,13 +67,11 @@ public class MainApp {
 	/** The Book list. */
 	private CheckBoxList BookList;
 	
-	/** The lbl books. */
-	private JLabel lblBooks;
-	
 	/** The btn download. */
 	private JButton btnDownload;
 	
 	TrayIcon trayIcon;
+	private JTextField txtSearch;
 
 	/**
 	 * Launch the application.
@@ -142,14 +146,6 @@ public class MainApp {
 		gbc_lblKindleStatus.gridx = 0;
 		gbc_lblKindleStatus.gridy = 0;
 		frmKindleAutoloader.getContentPane().add(lblKindleStatus, gbc_lblKindleStatus);
-		
-		lblBooks = new JLabel("Books:");
-		lblBooks.setHorizontalAlignment(SwingConstants.LEFT);
-		GridBagConstraints gbc_lblBooks = new GridBagConstraints();
-		gbc_lblBooks.insets = new Insets(0, 0, 5, 0);
-		gbc_lblBooks.gridx = 0;
-		gbc_lblBooks.gridy = 1;
-		frmKindleAutoloader.getContentPane().add(lblBooks, gbc_lblBooks);
 
 		Library localBooks = null;
 		try {
@@ -169,6 +165,34 @@ public class MainApp {
 		JCheckBox[] b = new JCheckBox[checkBoxList.size()];
 		b = checkBoxList.toArray(b);
 		BookList.setListData(b);   // set the list data for the object
+		
+		txtSearch = new JTextField();
+		txtSearch.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusGained(FocusEvent e) {
+				if(txtSearch.getForeground() == Color.GRAY){
+					txtSearch.setText("");
+					txtSearch.setForeground(Color.BLACK);
+				}
+			}
+			@Override
+			public void focusLost(FocusEvent e) {
+				if(txtSearch.getText().equals("")){
+					txtSearch.setText("Search");
+					txtSearch.setForeground(Color.GRAY);
+				}
+			}
+		});
+		
+		txtSearch.setForeground(Color.GRAY);
+		txtSearch.setText("Search");
+		GridBagConstraints gbc_txtSearch = new GridBagConstraints();
+		gbc_txtSearch.insets = new Insets(0, 0, 5, 0);
+		gbc_txtSearch.fill = GridBagConstraints.HORIZONTAL;
+		gbc_txtSearch.gridx = 0;
+		gbc_txtSearch.gridy = 1;
+		frmKindleAutoloader.getContentPane().add(txtSearch, gbc_txtSearch);
+		txtSearch.setColumns(10);
 		
 		btnDownload = new JButton("Put on kindle");
 		GridBagConstraints gbc_btnDownload = new GridBagConstraints();
