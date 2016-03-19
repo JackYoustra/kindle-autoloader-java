@@ -138,10 +138,10 @@ public class MainApp {
 		frmKindleAutoloader.setBounds(100, 100, 454, 297);
 		frmKindleAutoloader.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		GridBagLayout gridBagLayout = new GridBagLayout();
-		gridBagLayout.columnWidths = new int[] { 434, 0 };
-		gridBagLayout.rowHeights = new int[] { 14, 0, 160, 0, 0, 0 };
-		gridBagLayout.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
-		gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 1.0, 0.0, 1.0, Double.MIN_VALUE };
+		gridBagLayout.columnWidths = new int[] { 434 };
+		gridBagLayout.rowHeights = new int[] {14, 0, 160};
+		gridBagLayout.columnWeights = new double[] { 1.0 };
+		gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 1.0, 0.0 };
 		frmKindleAutoloader.getContentPane().setLayout(gridBagLayout);
 
 		lblKindleStatus = new JLabel("Kindle Not Connected");
@@ -217,6 +217,7 @@ public class MainApp {
 		
 		scrollPane = new JScrollPane(table);
 		GridBagConstraints gbc_scrollPane = new GridBagConstraints();
+		gbc_scrollPane.weighty = 1.0;
 		gbc_scrollPane.insets = new Insets(0, 0, 5, 0);
 		gbc_scrollPane.fill = GridBagConstraints.BOTH;
 		gbc_scrollPane.gridx = 0;
