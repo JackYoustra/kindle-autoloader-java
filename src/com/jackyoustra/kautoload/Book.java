@@ -36,9 +36,23 @@ public class Book {
 		return author;
 	}
 
+	public String getMD5(){
+		return filename.substring(0, filename.indexOf('.'));
+	}
+	
+	public String getExtension(){
+		return filename.substring(filename.indexOf('.') + 1);
+	}
+	
+	/**
+	 * Gets the filename. Format is <md5>.<extension>
+	 *
+	 * @return the filename
+	 */
 	public String getFilename() {
 		return filename;
 	}
+	
 
 	public URL getDownloadLocation() {
 		return downloadLocation;

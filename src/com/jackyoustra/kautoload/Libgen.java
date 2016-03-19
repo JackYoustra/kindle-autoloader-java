@@ -1,11 +1,15 @@
 package com.jackyoustra.kautoload;
 
 import java.io.BufferedReader;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.regex.Matcher;
@@ -84,6 +88,17 @@ public class Libgen {
 		final Book[] urls = new Book[books.size()];
 		books.toArray(urls);
 		return urls; // unable to find any
+	}
+	
+	public static void download(String md5, String path) throws IOException{
+		URL destWebpage = new URL(mirror + 
+				"get.php?" +
+				"md5=" +
+				md5);
+		ReadableByteChannel byteChannel = Channels.newChannel(destWebpage.openStream());
+		FileOutputStream outputStream = new FileOutputStream(path);
+		outputStream.getChannel().transferFrom(byteChannel, 0, Long.MAX_VALUE); // shouldn't run into any problems now...
+		outputStream.close();
 	}
 	
 	public static void main(String[] args) {

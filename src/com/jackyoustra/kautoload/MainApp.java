@@ -222,7 +222,15 @@ public class MainApp {
 		
 		btnDownload.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
-
+				final int selectedRow = table.getSelectedRow();
+				final Book selectedBook = tableModel.getBook(selectedRow);
+				final String md5 = selectedBook.getMD5();
+				try {
+					Libgen.download(md5, getKindleDocumentsDirectory());
+				} catch (IOException e) {
+					JOptionPane.showMessageDialog(frmKindleAutoloader, "Error", "Error downloading book", JOptionPane.ERROR_MESSAGE);
+					e.printStackTrace();
+				}
 			}
 		});
 		
