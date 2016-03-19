@@ -1,6 +1,7 @@
 package com.jackyoustra.kautoload;
 
 import java.awt.AWTException;
+import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -9,49 +10,37 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
-import java.awt.ScrollPane;
 import java.awt.SystemTray;
+import java.awt.Toolkit;
 import java.awt.TrayIcon;
 import java.awt.TrayIcon.MessageType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileSystemView;
-import javax.swing.table.TableModel;
-
-import java.awt.Toolkit;
-
-import javax.swing.JTextField;
-
-import java.awt.Color;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -78,14 +67,19 @@ public class MainApp {
 	private JTextField txtSearch;
 	private JScrollPane scrollPane;
 	private JTable table;
-	private LibgenTableModel tableModel = new LibgenTableModel();
+	private LibgenTableModel tableModel;
 
 	/**
 	 * Launch the application.
 	 *
 	 * @param args the arguments
+	 * @throws UnsupportedLookAndFeelException 
+	 * @throws IllegalAccessException 
+	 * @throws InstantiationException 
+	 * @throws ClassNotFoundException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
+		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -116,13 +110,6 @@ public class MainApp {
 
 			// set the name of the application menu item
 			System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Kindle Autoloader");
-			// set the look and feel
-			try {
-				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			} catch (Exception e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
 		}
 
 		frmKindleAutoloader = new JFrame();
@@ -212,6 +199,8 @@ public class MainApp {
 		gbc_txtSearch.gridy = 1;
 		frmKindleAutoloader.getContentPane().add(txtSearch, gbc_txtSearch);
 		txtSearch.setColumns(10);
+		
+		tableModel = new LibgenTableModel();
 		
 		table = new JTable(tableModel);
 		

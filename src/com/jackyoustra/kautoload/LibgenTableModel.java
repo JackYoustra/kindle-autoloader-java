@@ -5,9 +5,10 @@ import javax.swing.table.AbstractTableModel;
 public class LibgenTableModel extends AbstractTableModel {
 
 	private Book[] books;
+	private String[] columnNames = {"Title", "Author", "Size"};
 	
 	public LibgenTableModel(){
-		this.books = new Book[0];
+		this(new Book[0]);
 	}
 	
 	public LibgenTableModel(Book[] books) {
@@ -27,6 +28,11 @@ public class LibgenTableModel extends AbstractTableModel {
 	@Override
 	public int getColumnCount() {
 		return 3;
+	}
+	
+	@Override
+	public String getColumnName(int column) {
+		return columnNames[column];
 	}
 
 	@Override
