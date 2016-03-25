@@ -5,7 +5,7 @@ import javax.swing.table.AbstractTableModel;
 public class LibgenTableModel extends AbstractTableModel {
 
 	private Book[] books;
-	private String[] columnNames = {"Title", "Author", "Extension", "Size"};
+	private String[] columnNames = {"Title", "Author", "Extension", "Size (kb)"};
 	
 	public LibgenTableModel(){
 		this(new Book[0]);
