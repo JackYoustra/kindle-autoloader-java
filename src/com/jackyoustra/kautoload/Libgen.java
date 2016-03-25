@@ -59,7 +59,6 @@ public class Libgen {
 		Elements tableData = doc.getElementsByTag("td"); // find all table data elements
 		for(Element tableDatum : tableData){
 			Element dlTag = tableDatum.getElementById("1");
-			System.out.println(dlTag);
 			if(dlTag != null){
 				final String currentLine = dlTag.toString();
 				final String lowerCaseLine = currentLine.toLowerCase();
