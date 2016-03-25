@@ -107,7 +107,7 @@ public class Libgen {
 		books.toArray(urls);
 		return urls;
 	}
-
+	
 	public static void download(String md5, String path) throws IOException{
 		URL destWebpage = new URL(mirror + 
 				"foreignfiction/" +

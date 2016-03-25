@@ -226,7 +226,8 @@ public class MainApp {
 				final Book selectedBook = tableModel.getBook(selectedRow);
 				final String md5 = selectedBook.getMD5();
 				try {
-					Libgen.download(md5, getKindleDocumentsDirectory());
+					Libgen.download(md5, getKindleDocumentsDirectory() + selectedBook.getFilename());
+					JOptionPane.showMessageDialog(frmKindleAutoloader, "Sucess", "Book Downloaded", JOptionPane.INFORMATION_MESSAGE);
 				} catch (IOException e) {
 					JOptionPane.showMessageDialog(frmKindleAutoloader, "Error", "Error downloading book", JOptionPane.ERROR_MESSAGE);
 					e.printStackTrace();
@@ -283,24 +284,18 @@ public class MainApp {
 		
 		// constantly check for kindle
 		ScheduledExecutorService ses = Executors.newScheduledThreadPool(1);
-		ses.schedule(new Runnable() {
+		// startup check to be accurate
+		kindleConnected = false;
+		listenForKindle();
+		kindleConnected = true;
+		listenForKindle();
+		ses.scheduleAtFixedRate(new Runnable() {
+			
 			@Override
 			public void run() {
-				// startup check to be accurate
-				kindleConnected = false;
 				listenForKindle();
-				kindleConnected = true;
-				listenForKindle();
-				while (true) {
-					listenForKindle();
-					try {
-						Thread.sleep(500);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
 			}
-		}, 0, TimeUnit.MILLISECONDS);
+		}, 0, 1, TimeUnit.SECONDS);
 	}
 
 	public void maximizeFrame(){
