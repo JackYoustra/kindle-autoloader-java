@@ -15,6 +15,11 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
 public class Libgen {
 	private static final String mirror = "http://gen.lib.rus.ec/";
 	
@@ -44,54 +49,70 @@ public class Libgen {
 		   finalHTML += strLine + "\n";
 		}
 		
-		ArrayList<Book> books = new ArrayList<>();
-		Scanner pageScanner = new Scanner(finalHTML);
-		while(pageScanner.hasNext()){ // break when it's found
-			final String currentLine = pageScanner.nextLine().toLowerCase();
-			if(currentLine.contains(term.toLowerCase())){
-				if(currentLine.contains("english")){
-					Pattern dlPattern = Pattern.compile("http[^\"]*get\\.php\\?md5=([a-z]|[0-9])*"); // it's an http request with an md5 arg
-					Matcher dlMatches = dlPattern.matcher(currentLine);
-					dlMatches.find();
-					final String dlLink = dlMatches.group();
-					final String md5 = dlLink.substring(dlLink.indexOf("=") + 1);
-					final URL dlURL = new URL(dlLink);
-					
-					final String authorPrefix = "uthor1:</td><td>";
-					final Pattern authorPattern = Pattern.compile(authorPrefix + "[^<]*"); // <td>Author1:</td><td>Clancy, Tom</td>
-					final Matcher authorMatcher = authorPattern.matcher(currentLine);
-					authorMatcher.find();
-					String author = authorMatcher.group();
-					author = author.substring(authorPrefix.length());
-					
-					final Pattern extensionPattern = Pattern.compile(">[a-z]*\\([0-9]*.*\\)"); //>epub(854kb)</a>
-					final Matcher extensionMatcher = extensionPattern.matcher(currentLine);
-					extensionMatcher.find();
-					final String extensionSize = extensionMatcher.group();
-					String extension = extensionSize.substring(1, extensionSize.indexOf('('));
-					
-					String sizeNotation = extensionSize.substring(extensionSize.indexOf('(')+1, extensionSize.indexOf(')')).toLowerCase();
-					int size = 0;
-					if(sizeNotation.indexOf('k') != -1){
-						size = Integer.parseInt(sizeNotation.substring(0, sizeNotation.indexOf('k')));
-					}
-					else if(sizeNotation.indexOf('m') != -1){
-						size = Integer.parseInt(sizeNotation.substring(0, sizeNotation.indexOf('m'))) * 1024; // iz megabyte
-					}
-					
-					Book currentBook = new Book(term, author, md5 + "." + extension, dlURL, size);
-					books.add(currentBook);
-				}
-			}
-		}
-		pageScanner.close();
-		final Book[] urls = new Book[books.size()];
-		books.toArray(urls);
+		final Book[] urls = booksFromHTML(finalHTML);
 		return urls; // unable to find any
 	}
 	
+	private static Book[] booksFromHTML(String finalHTML) throws MalformedURLException {
+		ArrayList<Book> books = new ArrayList<>();
+		Document doc = Jsoup.parse(finalHTML);
+		Elements tableData = doc.getElementsByTag("td"); // find all table data elements
+		for(Element tableDatum : tableData){
+			Element dlTag = tableDatum.getElementById("1");
+			System.out.println(dlTag);
+			if(dlTag != null){
+				final String currentLine = dlTag.toString();
+				final String lowerCaseLine = currentLine.toLowerCase();
+					if(lowerCaseLine.contains("english")){
+						Pattern dlPattern = Pattern.compile("/foreignfiction/get\\.php\\?md5=([a-z]|[0-9])*"); // it's an http request with an md5 arg
+						Matcher dlMatches = dlPattern.matcher(currentLine);
+						dlMatches.find();
+						final String dlLink = dlMatches.group();
+						final String md5 = dlLink.substring(dlLink.indexOf("=") + 1);
+						final URL dlURL = new URL(mirror + dlLink);
+						
+						final String titlePrefix = "itle:</td><td>";
+						final Pattern titlePattern = Pattern.compile(titlePrefix + "[^<]*");  // <td>Title1:</td><td>The Hunt for Red October</td>
+						final Matcher titleMatcher = titlePattern.matcher(currentLine);
+						titleMatcher.find();
+						String title = titleMatcher.group();
+						title = title.substring(titlePrefix.length());
+						
+						final String authorPrefix = "uthor1:</td><td>";
+						final Pattern authorPattern = Pattern.compile(authorPrefix + "[^<]*"); // <td>Author1:</td><td>Clancy, Tom</td>
+						final Matcher authorMatcher = authorPattern.matcher(currentLine);
+						authorMatcher.find();
+						String author = authorMatcher.group();
+						author = author.substring(authorPrefix.length());
+						
+						final Pattern extensionPattern = Pattern.compile(">[a-z]*\\([0-9]*.*\\)"); //>epub(854kb)</a>
+						final Matcher extensionMatcher = extensionPattern.matcher(currentLine);
+						extensionMatcher.find();
+						final String extensionSize = extensionMatcher.group();
+						String extension = extensionSize.substring(1, extensionSize.indexOf('('));
+						
+						String sizeNotation = extensionSize.substring(extensionSize.indexOf('(')+1, extensionSize.indexOf(')')).toLowerCase();
+						int size = 0;
+						if(sizeNotation.indexOf('k') != -1){
+							size = Integer.parseInt(sizeNotation.substring(0, sizeNotation.indexOf('k')));
+						}
+						else if(sizeNotation.indexOf('m') != -1){
+							size = Integer.parseInt(sizeNotation.substring(0, sizeNotation.indexOf('m'))) * 1024; // iz megabyte
+						}
+						
+						Book currentBook = new Book(title, author, md5 + "." + extension, dlURL, size);
+						books.add(currentBook);
+					}
+			}
+		}
+		Book[] urls = new Book[books.size()];
+		books.toArray(urls);
+		return urls;
+	}
+
 	public static void download(String md5, String path) throws IOException{
 		URL destWebpage = new URL(mirror + 
+				"foreignfiction/" +
 				"get.php?" +
 				"md5=" +
 				md5);
@@ -108,7 +129,6 @@ public class Libgen {
 				System.out.println(result);
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
