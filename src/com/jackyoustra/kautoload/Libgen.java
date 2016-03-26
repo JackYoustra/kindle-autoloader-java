@@ -53,7 +53,7 @@ public class Libgen {
 	}
 	
 	private static Book[] booksFromHTML(String finalHTML) throws MalformedURLException {
-		ArrayList<Book> books = new ArrayList<>();
+		ArrayList<Book> books = new ArrayList<Book>();
 		Document doc = Jsoup.parse(finalHTML);
 		Elements tableData = doc.getElementsByTag("td"); // find all table data elements
 		for(Element tableDatum : tableData){
