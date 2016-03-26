@@ -163,6 +163,7 @@ public class MainApp {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					Book[] books = Libgen.search(txtSearch.getText());
+					System.out.println(books.toString());
 					tableModel.update(books);
 					
 				} catch (IOException e1) {
@@ -227,7 +228,7 @@ public class MainApp {
 				final String md5 = selectedBook.getMD5();
 				try {
 					Libgen.download(md5, getKindleDocumentsDirectory() + selectedBook.getFilename());
-					JOptionPane.showMessageDialog(frmKindleAutoloader, "Sucess", "Book Downloaded", JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(frmKindleAutoloader, "Book successfuly downloaded to Kindle", "Success", JOptionPane.INFORMATION_MESSAGE);
 				} catch (IOException e) {
 					JOptionPane.showMessageDialog(frmKindleAutoloader, "Error", "Error downloading book", JOptionPane.ERROR_MESSAGE);
 					e.printStackTrace();
