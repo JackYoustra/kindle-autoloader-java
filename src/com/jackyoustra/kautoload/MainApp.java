@@ -29,8 +29,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -140,21 +138,6 @@ public class MainApp {
 		gbc_lblKindleStatus.gridx = 0;
 		gbc_lblKindleStatus.gridy = 0;
 		frmKindleAutoloader.getContentPane().add(lblKindleStatus, gbc_lblKindleStatus);
-
-		Library localBooks = null;
-		try {
-			localBooks = new Library(getManifestFileLocation());
-		} catch (Exception e) {
-			JOptionPane.showMessageDialog(frmKindleAutoloader,
-					"Error getting book list!\nPlease restart");
-			e.printStackTrace();
-		}
-		
-		List<Book> books = localBooks.getBooks();
-		List<JCheckBox> checkBoxList = new ArrayList<JCheckBox>(books.size());
-		for(Book currentBook : books){
-			checkBoxList.add(new JCheckBox(currentBook.getDisplayTitle()));
-		}
 		
 		txtSearch = new JTextField();
 		txtSearch.addActionListener(new ActionListener() {
@@ -306,39 +289,6 @@ public class MainApp {
 	
 	private static boolean isMac(){
 		return System.getProperty("os.name").contains("Mac OS");
-	}
-	
-	/**
-	 * Gets the documents directory.
-	 *
-	 * @return the documents directory
-	 */
-	private static String getDocumentsDirectory() {
-		// possibly one level too high for mac
-		JFileChooser fr = new JFileChooser();
-		FileSystemView fw = fr.getFileSystemView();
-		if(isMac()){
-			return fw.getDefaultDirectory().toString() + File.separator + "Documents" + File.separator;
-		}
-		return fw.getDefaultDirectory().toString() + File.separator;
-	}
-	
-	/**
-	 * Gets the ebooks file folder.
-	 *
-	 * @return the ebooks file folder
-	 */
-	private static String getEbooksFileFolder(){
-		return getDocumentsDirectory() + "ebooks" + File.separator;
-	}
-
-	/**
-	 * Gets the manifest file location.
-	 *
-	 * @return the manifest file location
-	 */
-	private static String getManifestFileLocation() {
-		return getEbooksFileFolder() + "thingToRead.xml";
 	}
 	
 	/**
