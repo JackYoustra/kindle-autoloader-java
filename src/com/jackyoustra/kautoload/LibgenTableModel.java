@@ -38,6 +38,15 @@ public class LibgenTableModel extends AbstractTableModel {
 	public Book getBook(int row){
 		return books[row];
 	}
+	
+	public void fireBookProgressUpdated(Book b){
+		for(int i = 0; i < books.length; i++){
+			if(books[i] == b){
+				fireTableCellUpdated(i, 3); // progess bar changed
+				break;
+			}
+		}
+	}
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
@@ -50,7 +59,12 @@ public class LibgenTableModel extends AbstractTableModel {
 		case 2:
 			return currentBook.getSize();
 		case 3:
-			return currentBook.getExtension();
+			if(currentBook.getProgress() == Book.DOWNLOAD_NOT_STARTED){
+				return currentBook.getExtension();
+			}
+			else{
+				return currentBook.getProgress();
+			}
 		default:
 			break;
 		}

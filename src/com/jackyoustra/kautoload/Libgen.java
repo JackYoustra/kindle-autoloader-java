@@ -19,6 +19,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import com.jackyoustra.kautoload.DownloadProgress.Downloader;
+import com.jackyoustra.kautoload.DownloadProgress.Downloader.ProgressNotifierDelegate;
+
 public class Libgen {
 	private static final String mirror = "http://gen.lib.rus.ec/";
 	
@@ -87,6 +90,17 @@ public class Libgen {
 					String title = titleMatcher.group();
 					title = title.substring(titlePrefix.length());
 					
+					// if no title, replace with series
+					if(title.equals("")){
+						final String seriesPrefix = "eries:</td><td>";
+						final Pattern seriesPattern = Pattern.compile(seriesPrefix + "[^<]*");  // Series:</td><td>To Love a Man</td>
+						final Matcher seriesMatcher = seriesPattern.matcher(currentLine);
+						seriesMatcher.find();
+						String series = seriesMatcher.group();
+						series = series.substring(seriesPrefix.length());
+						title = series;
+					}
+					
 					final String authorPrefix = "uthor1:</td><td>";
 					final Pattern authorPattern = Pattern.compile(authorPrefix + "[^<]*"); // <td>Author1:</td><td>Clancy, Tom</td>
 					final Matcher authorMatcher = authorPattern.matcher(currentLine);
@@ -119,16 +133,13 @@ public class Libgen {
 		return urls;
 	}
 	
-	public static void download(String md5, String path) throws IOException{
+	public static void download(String md5, String path, ProgressNotifierDelegate delegate) throws IOException{
 		URL destWebpage = new URL(mirror + 
 				"foreignfiction/" +
 				"get.php?" +
 				"md5=" +
 				md5);
-		ReadableByteChannel byteChannel = Channels.newChannel(destWebpage.openStream());
-		FileOutputStream outputStream = new FileOutputStream(path);
-		outputStream.getChannel().transferFrom(byteChannel, 0, Long.MAX_VALUE); // shouldn't run into any problems now...
-		outputStream.close();
+		Downloader dl = new Downloader(path, destWebpage.toString(), delegate);
 	}
 	
 	public static void main(String[] args) {

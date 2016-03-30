@@ -42,6 +42,8 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileSystemView;
 
+import com.jackyoustra.kautoload.DownloadProgress.Downloader.ProgressNotifierDelegate;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class MainApp.
@@ -187,7 +189,7 @@ public class MainApp {
 		
 		tableModel = new LibgenTableModel();
 		
-		table = new JTable(tableModel);
+		table = new DownloadTable(tableModel);
 		
 		scrollPane = new JScrollPane(table);
 		GridBagConstraints gbc_scrollPane = new GridBagConstraints();
@@ -211,12 +213,26 @@ public class MainApp {
 				final Book selectedBook = tableModel.getBook(selectedRow);
 				final String md5 = selectedBook.getMD5();
 				final String dlPath = getKindleDocumentsDirectory() + selectedBook.getFilename();
+				final ProgressNotifierDelegate delegate = new ProgressNotifierDelegate() {
+					
+					@Override
+					public void progressChanged(int progress) {
+						SwingUtilities.invokeLater(new Runnable() {
+							
+							@Override
+							public void run() {
+								selectedBook.setProgress(progress);
+								tableModel.fireBookProgressUpdated(selectedBook);
+							}
+						});
+					}
+				};
 				// return true on success, false on failure
 				SwingWorker<Boolean, Void> worker = new SwingWorker<Boolean, Void>() {
 					@Override
 					protected Boolean doInBackground(){
 						try{
-							Libgen.download(md5, dlPath);
+							Libgen.download(md5, dlPath, delegate);
 							SwingUtilities.invokeLater(new Runnable() {
 								@Override
 								public void run() {
@@ -235,6 +251,7 @@ public class MainApp {
 						}
 					}
 				};
+				worker.execute();
 			}
 		});
 		

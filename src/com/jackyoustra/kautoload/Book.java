@@ -8,12 +8,14 @@ import java.io.RandomAccessFile;
 import java.net.URL;
 
 public class Book {
+	public static final int DOWNLOAD_NOT_STARTED = -1;
 	private String title;
 	private String author;
 	private String filename;
 	private String md5;
 	private URL downloadLocation;
 	private int size; // in kb
+	private int progress = DOWNLOAD_NOT_STARTED;
 	
 	public Book(String title, String author, String filename) {
 		this.title = title;
@@ -42,12 +44,22 @@ public class Book {
 		return md5;
 	}
 	
+	public int getProgress() {
+		return progress;
+	}
+	
+	// range: a number between 0-100
+	public void setProgress(int progress) {
+		// validation
+		this.progress = progress;
+	}
+	
 	public String getExtension(){
 		return filename.substring(filename.indexOf('.') + 1);
 	}
 	
 	/**
-	 * Gets the filename. Format is <md5>.<extension>
+	 * Gets the filename. Format is <title>.<extension>
 	 *
 	 * @return the filename
 	 */
