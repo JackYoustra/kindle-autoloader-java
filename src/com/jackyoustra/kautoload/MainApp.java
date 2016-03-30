@@ -36,6 +36,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileSystemView;
@@ -146,7 +148,6 @@ public class MainApp {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					Book[] books = Libgen.search(txtSearch.getText());
-					System.out.println(books.toString());
 					tableModel.update(books);
 					
 				} catch (IOException e1) {
@@ -209,13 +210,31 @@ public class MainApp {
 				final int selectedRow = table.getSelectedRow();
 				final Book selectedBook = tableModel.getBook(selectedRow);
 				final String md5 = selectedBook.getMD5();
-				try {
-					Libgen.download(md5, getKindleDocumentsDirectory() + selectedBook.getFilename());
-					JOptionPane.showMessageDialog(frmKindleAutoloader, "Book successfuly downloaded to Kindle", "Success", JOptionPane.INFORMATION_MESSAGE);
-				} catch (IOException e) {
-					JOptionPane.showMessageDialog(frmKindleAutoloader, "Error", "Error downloading book", JOptionPane.ERROR_MESSAGE);
-					e.printStackTrace();
-				}
+				final String dlPath = getKindleDocumentsDirectory() + selectedBook.getFilename();
+				// return true on success, false on failure
+				SwingWorker<Boolean, Void> worker = new SwingWorker<Boolean, Void>() {
+					@Override
+					protected Boolean doInBackground(){
+						try{
+							Libgen.download(md5, dlPath);
+							SwingUtilities.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									JOptionPane.showMessageDialog(frmKindleAutoloader, "Book successfuly downloaded to Kindle", "Success", JOptionPane.INFORMATION_MESSAGE);
+								}
+							});
+							return true;
+						}catch(IOException e){
+							SwingUtilities.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									JOptionPane.showMessageDialog(frmKindleAutoloader, "Error", "Error downloading book", JOptionPane.ERROR_MESSAGE);
+								}
+							});
+							return false;
+						}
+					}
+				};
 			}
 		});
 		

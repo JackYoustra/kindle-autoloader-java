@@ -5,7 +5,7 @@ import javax.swing.table.AbstractTableModel;
 public class LibgenTableModel extends AbstractTableModel {
 
 	private Book[] books;
-	private String[] columnNames = {"Title", "Author", "Extension", "Size (kb)"};
+	private String[] columnNames = {"Title", "Author", "Size (kb)", "Extension"};
 	
 	public LibgenTableModel(){
 		this(new Book[0]);
@@ -48,9 +48,9 @@ public class LibgenTableModel extends AbstractTableModel {
 		case 1:
 			return currentBook.getAuthor();
 		case 2:
-			return currentBook.getExtension();
-		case 3:
 			return currentBook.getSize();
+		case 3:
+			return currentBook.getExtension();
 		default:
 			break;
 		}

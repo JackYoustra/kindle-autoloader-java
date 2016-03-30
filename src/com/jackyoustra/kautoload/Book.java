@@ -11,6 +11,7 @@ public class Book {
 	private String title;
 	private String author;
 	private String filename;
+	private String md5;
 	private URL downloadLocation;
 	private int size; // in kb
 	
@@ -20,10 +21,11 @@ public class Book {
 		this.filename = filename;
 	}
 	
-	public Book(String title, String author, String filename, URL downloadLocation, int size) {
+	public Book(String title, String author, String md5, String extension, URL downloadLocation, int size) {
 		this.title = title;
 		this.author = author;
-		this.filename = filename;
+		this.md5 = md5;
+		this.filename = title + "." + extension;
 		this.downloadLocation = downloadLocation;
 		this.size = size;
 	}
@@ -37,7 +39,7 @@ public class Book {
 	}
 
 	public String getMD5(){
-		return filename.substring(0, filename.indexOf('.'));
+		return md5;
 	}
 	
 	public String getExtension(){
