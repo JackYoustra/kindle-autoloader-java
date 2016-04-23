@@ -133,13 +133,13 @@ public class Libgen {
 		return urls;
 	}
 	
-	public static void download(String md5, String path, ProgressNotifierDelegate delegate) throws IOException{
+	public static void download(String md5, String path, int expectedLength, ProgressNotifierDelegate delegate) throws IOException{
 		URL destWebpage = new URL(mirror + 
 				"foreignfiction/" +
 				"get.php?" +
 				"md5=" +
 				md5);
-		Downloader dl = new Downloader(path, destWebpage.toString(), delegate);
+		Downloader dl = new Downloader(path, destWebpage.toString(), expectedLength, delegate);
 	}
 	
 	public static void main(String[] args) {

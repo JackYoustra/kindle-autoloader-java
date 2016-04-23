@@ -232,7 +232,7 @@ public class MainApp {
 					@Override
 					protected Boolean doInBackground(){
 						try{
-							Libgen.download(md5, dlPath, delegate);
+							Libgen.download(md5, dlPath, selectedBook.getSize(), delegate);
 							SwingUtilities.invokeLater(new Runnable() {
 								@Override
 								public void run() {

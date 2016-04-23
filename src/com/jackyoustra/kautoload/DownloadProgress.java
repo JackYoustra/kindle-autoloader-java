@@ -41,7 +41,7 @@ public class DownloadProgress {
     		public void progressChanged(int progress);
     	}
     	
-        public Downloader( String localPath, String remoteURL, ProgressNotifierDelegate delegate) {
+        public Downloader( String localPath, String remoteURL, int expectedLength, ProgressNotifierDelegate delegate) {
             FileOutputStream        fos;
             ReadableByteChannel     rbc;
             URL                     url;
@@ -49,9 +49,11 @@ public class DownloadProgress {
             try {
             	this.delegate = delegate;
                 url = new URL( remoteURL );
-                rbc = new RBCWrapper( Channels.newChannel( url.openStream() ), contentLength( url ), this );
+                rbc = new RBCWrapper( Channels.newChannel( url.openStream() ), expectedLength*1024, this );
                 fos = new FileOutputStream( localPath );
+                System.out.println("URL: " + url.toString() + " RBC: " + rbc.toString() + " FOS: + " + fos.toString());
                 fos.getChannel().transferFrom( rbc, 0, Long.MAX_VALUE );
+                fos.close();
             } catch ( Exception e ) {
                 System.err.println( "Uh oh: " + e.getMessage() );
             }
@@ -99,7 +101,7 @@ public class DownloadProgress {
             int                     n;
             double                  progress;
 
-            if ( ( n = rbc.read( bb ) ) > 0 ) {
+            if ( ( n = rbc.read( bb ) ) >= 0 ) {
                 readSoFar += n;
                 progress = expectedSize > 0 ? (double) readSoFar / (double) expectedSize * 100.0 : -1.0;
                 delegate.rbcProgressCallback( this, progress );
@@ -107,5 +109,10 @@ public class DownloadProgress {
 
             return n;
         }
+
+		@Override
+		public String toString() {
+			return "RBCWrapper [delegate=" + delegate + ", expectedSize=" + expectedSize + ", rbc=" + rbc + ", readSoFar=" + readSoFar + "]";
+		}
     }
 }
