@@ -1,8 +1,14 @@
 package com.jackyoustra.kautoload;
 
 import java.awt.Component;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -13,9 +19,17 @@ public class DownloadTable extends JTable {
 
 
 	private static class ProgressRenderer extends DefaultTableCellRenderer {
-	
+		private static BufferedImage image;
 	    private final JProgressBar progressBar = new JProgressBar(0, 100);
-	
+	    private final JLabel imageLabel = new JLabel(new ImageIcon(image)); 
+	    static{
+	    	try {
+				image = ImageIO.read(new File("src" + File.separator + "assets" + File.separator + "uiactivityindicator_intro.png"));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+	    }
+	    
 	    public ProgressRenderer() {
 	        super();
 	        setOpaque(true);
@@ -29,8 +43,13 @@ public class DownloadTable extends JTable {
 	        }
 	        else if(value instanceof Integer){
 	        	Integer i = (Integer) value;
-	            progressBar.setValue(i);
-	            return progressBar;
+	        	if(i == Book.DOWNLOAD_HANG){
+	        		return imageLabel;
+	        	}
+	        	else{
+	        		progressBar.setValue(i);
+	            	return progressBar;
+	        	}
 	        }
 	        else{
 	        	System.err.println("unexpected output");
@@ -38,6 +57,7 @@ public class DownloadTable extends JTable {
 	        return this;
 	    }
 	}
+	
 	
 	public DownloadTable() {
 		super();

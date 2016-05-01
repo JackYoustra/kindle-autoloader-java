@@ -34,7 +34,7 @@ public class DownloadProgress {
     }
 
     public static final class Downloader implements RBCWrapperDelegate {
-        private ProgressNotifierDelegate delegate;
+    	private ProgressNotifierDelegate delegate;
 
     	public static interface ProgressNotifierDelegate{
     		// is passed in progress number 0-100
@@ -43,16 +43,27 @@ public class DownloadProgress {
     	
         public Downloader( String localPath, String remoteURL, int expectedLength, ProgressNotifierDelegate delegate) {
             FileOutputStream        fos;
-            ReadableByteChannel     rbc;
+            RBCWrapper     			rbc;
             URL                     url;
 
             try {
             	this.delegate = delegate;
                 url = new URL( remoteURL );
-                rbc = new RBCWrapper( Channels.newChannel( url.openStream() ), expectedLength*1024, this );
+                long time = System.nanoTime();
+                rbcProgressCallback(null, Book.DOWNLOAD_HANG); // hang first
+                rbc = new RBCWrapper( Channels.newChannel( url.openStream() ), expectedLength*1024, this ); // takes a while
+                try{
+                	Thread.sleep(1000*1000);
+                }catch(Exception e){
+                	System.err.println("interrupt");
+                }
+                rbcProgressCallback(rbc, 0); // better now
+                System.out.println("Time to open stream: " + (System.nanoTime() - time)/Math.pow(10, 9) + " secs");
                 fos = new FileOutputStream( localPath );
                 System.out.println("URL: " + url.toString() + " RBC: " + rbc.toString() + " FOS: + " + fos.toString());
+                
                 fos.getChannel().transferFrom( rbc, 0, Long.MAX_VALUE );
+                rbcProgressCallback(rbc, 100.0); // probably about 100% now, update
                 fos.close();
             } catch ( Exception e ) {
                 System.err.println( "Uh oh: " + e.getMessage() );

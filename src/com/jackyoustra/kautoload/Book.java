@@ -9,6 +9,7 @@ import java.net.URL;
 
 public class Book {
 	public static final int DOWNLOAD_NOT_STARTED = -1;
+	public static final int DOWNLOAD_HANG = -2;
 	private String title;
 	private String author;
 	private String filename;

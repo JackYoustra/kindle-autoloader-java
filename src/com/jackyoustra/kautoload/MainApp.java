@@ -221,6 +221,9 @@ public class MainApp {
 							
 							@Override
 							public void run() {
+								if(progress == -1){
+									System.out.println(progress);
+								}
 								selectedBook.setProgress(progress);
 								tableModel.fireBookProgressUpdated(selectedBook);
 							}
