@@ -76,7 +76,7 @@ public class Libgen {
 				final String currentLine = dlTag.toString();
 				final String lowerCaseLine = currentLine.toLowerCase();
 				if(lowerCaseLine.contains("english")){
-					Pattern dlPattern = Pattern.compile("/foreignfiction/get\\.php\\?md5=([a-z]|[0-9])*"); // it's an http request with an md5 arg
+					Pattern dlPattern = Pattern.compile("/foreignfiction/ads\\.php\\?md5=([a-z]|[0-9])*"); // it's an http request with an md5 arg
 					Matcher dlMatches = dlPattern.matcher(currentLine);
 					dlMatches.find();
 					final String dlLink = dlMatches.group();
