@@ -79,8 +79,7 @@ public class Book {
 	
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
-		return this.title + "\n" + this.author + "\n" + this.filename + " (" + size + "kb)";
+		return this.title + "\n" + this.author + "\n" + this.filename + " (" + size + "kb)" + "\nmd5: " + this.md5;
 	}
 
 	public String getDisplayTitle() {

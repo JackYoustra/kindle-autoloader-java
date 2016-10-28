@@ -52,11 +52,13 @@ public class DownloadProgress {
                 long time = System.nanoTime();
                 rbcProgressCallback(null, Book.DOWNLOAD_HANG); // hang first
                 rbc = new RBCWrapper( Channels.newChannel( url.openStream() ), expectedLength*1024, this ); // takes a while
+                /*
                 try{
                 	Thread.sleep(1000*1000);
                 }catch(Exception e){
                 	System.err.println("interrupt");
                 }
+               */ 
                 rbcProgressCallback(rbc, 0); // better now
                 System.out.println("Time to open stream: " + (System.nanoTime() - time)/Math.pow(10, 9) + " secs");
                 fos = new FileOutputStream( localPath );

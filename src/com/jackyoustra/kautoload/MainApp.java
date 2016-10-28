@@ -3,6 +3,7 @@ package com.jackyoustra.kautoload;
 import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -24,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -82,17 +84,40 @@ public class MainApp {
 	 */
 	public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        setDefaultSize(36);
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
 					MainApp window = new MainApp();
 					window.frmKindleAutoloader.setVisible(true);
+					window.table.setRowHeight((int) (36*1.2));
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		});
 	}
+	
+	public static void setDefaultSize(int size) {
+        Set<Object> keySet = UIManager.getLookAndFeelDefaults().keySet();
+        Object[] keys = keySet.toArray(new Object[keySet.size()]);
+
+        for (Object key : keys) {
+
+            if (key != null && key.toString().toLowerCase().contains("font")) {
+
+                System.out.println(key);
+                Font font = UIManager.getDefaults().getFont(key);
+                if (font != null) {
+                    font = font.deriveFont((float)size);
+                    UIManager.put(key, font);
+                }
+
+            }
+
+        }
+
+    }
 
 	/**
 	 * Create the application.
@@ -151,7 +176,6 @@ public class MainApp {
 				try {
 					Book[] books = Libgen.search(txtSearch.getText());
 					tableModel.update(books);
-					
 				} catch (IOException e1) {
 					lblKindleStatus.setText("Internet Error");
 					lblKindleStatus.setForeground(Color.RED);
