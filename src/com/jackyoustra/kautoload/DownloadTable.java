@@ -1,5 +1,6 @@
 package com.jackyoustra.kautoload;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Image;
@@ -60,6 +61,11 @@ public class DownloadTable extends JTable {
 	        	}
 	        	else{
 	        		progressBar.setValue(i);
+	        		if(i == 100){
+	        			progressBar.setStringPainted(true);
+	        			progressBar.setString("Complete!");
+	        			progressBar.setForeground(Color.blue);
+	        		}
 	            	return progressBar;
 	        	}
 	        }
