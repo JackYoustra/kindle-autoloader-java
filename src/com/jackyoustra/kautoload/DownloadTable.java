@@ -7,8 +7,11 @@ import java.awt.Image;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
 import java.io.File;
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -16,6 +19,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
@@ -47,6 +51,25 @@ public class DownloadTable extends JTable {
 	        imageLabel = new JLabel(new ImageIcon(scaled));
 	        progressBar.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
 	        imageLabel.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+	        /*
+	        Timer t = new Timer();
+	        t.schedule(new TimerTask() {
+				
+				@Override
+				public void run() {
+					SwingUtilities.invokeLater(new Runnable() {
+						
+						@Override
+						public void run() {
+							BufferedImage rotatedPhoto = Scalr.rotate((BufferedImage)((ImageIcon)imageLabel.getIcon()).getImage(), Scalr.Rotation.CW_90, (BufferedImageOp[]) null);
+							imageLabel.setIcon(new ImageIcon(rotatedPhoto));
+							imageLabel.repaint();
+							System.out.println("rotate");
+						}
+					});
+				}
+			}, 0, 300);
+	        */
 	    }
 	
 	    @Override
