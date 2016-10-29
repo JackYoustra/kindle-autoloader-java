@@ -144,7 +144,7 @@ public class Libgen {
 	
 	public static void main(String[] args) {
 		try {
-			final Book[] results = search("The Hunt for Red October");
+			final Book[] results = search("A Tale of Two Cities");
 			for(Book result : results){
 				System.out.println(result);
 			}
