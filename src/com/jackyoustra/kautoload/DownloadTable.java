@@ -3,15 +3,10 @@ package com.jackyoustra.kautoload;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Image;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
+import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
-import java.awt.image.BufferedImageOp;
 import java.io.File;
 import java.io.IOException;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -19,7 +14,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import javax.swing.JTable;
-import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
@@ -31,10 +25,10 @@ public class DownloadTable extends JTable {
 	private static class ProgressRenderer extends DefaultTableCellRenderer {
 		private static BufferedImage image;
 	    private final JProgressBar progressBar = new JProgressBar(0, 100);
-	    private final JLabel imageLabel; 
+	    private final JLabel imageLabel;
 	    static{
 	    	try {
-				image = ImageIO.read(new File("src" + File.separator + "assets" + File.separator + "uiactivityindicator_intro.png"));
+				image = ImageIO.read(MainApp.class.getResourceAsStream("/src/assets/uiactivityindicator_intro.png"));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

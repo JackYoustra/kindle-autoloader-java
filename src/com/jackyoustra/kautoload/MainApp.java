@@ -84,11 +84,11 @@ public class MainApp {
 	 */
 	public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        setDefaultSize(36);
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
 					MainApp window = new MainApp();
+			        //setDefaultSize(36);
 					window.frmKindleAutoloader.setVisible(true);
 					window.table.setRowHeight((int) (36*1.2));
 				} catch (Exception e) {
@@ -143,10 +143,10 @@ public class MainApp {
 		frmKindleAutoloader.setTitle("Kindle Autoloader");
 		// set image icons
 		List<Image> icons = new ArrayList<Image>();
-		icons.add(Toolkit.getDefaultToolkit().getImage(MainApp.class.getResource("/assets/KindleXferIcon 128x128.png")));
-		icons.add(Toolkit.getDefaultToolkit().getImage(MainApp.class.getResource("/assets/KindleXferIcon 64x64.png")));
-		icons.add(Toolkit.getDefaultToolkit().getImage(MainApp.class.getResource("/assets/KindleXferIcon 32x32.png")));
-		icons.add(Toolkit.getDefaultToolkit().getImage(MainApp.class.getResource("/assets/KindleXferIcon 16x16.png")));
+		icons.add(Toolkit.getDefaultToolkit().getImage(MainApp.class.getResource("/src/assets/KindleXferIcon 128x128.png")));
+		icons.add(Toolkit.getDefaultToolkit().getImage(MainApp.class.getResource("/src/assets/KindleXferIcon 64x64.png")));
+		icons.add(Toolkit.getDefaultToolkit().getImage(MainApp.class.getResource("/src/assets/KindleXferIcon 32x32.png")));
+		icons.add(Toolkit.getDefaultToolkit().getImage(MainApp.class.getResource("/src/assets/KindleXferIcon 16x16.png")));
 		frmKindleAutoloader.setIconImages(icons);
 		// end set
 		frmKindleAutoloader.setBounds(100, 100, 454, 297);
@@ -293,7 +293,7 @@ public class MainApp {
 		// create popup menu
 		if(SystemTray.isSupported()){
 			final PopupMenu popup = new PopupMenu();
-			trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage(MainApp.class.getResource("/assets/KindleXferIcon 16x16.png")));
+			trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage(MainApp.class.getResource("/src/assets/KindleXferIcon 16x16.png")));
 			trayIcon.setImageAutoSize(true);
 			final SystemTray tray = SystemTray.getSystemTray();
 			
